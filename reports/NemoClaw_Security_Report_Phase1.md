@@ -5,7 +5,7 @@
 | Field | Value |
 |-------|-------|
 | Date | March 17, 2026 |
-| Analyst | Mike |
+| Analyst | 0xgrimRPR |
 | Role | Junior Cybersecurity Engineer / Red Team Track |
 | Target | NVIDIA NemoClaw v0.1.0 (Early Preview — Alpha) |
 | Environment | VMware VM / Ubuntu 22.04 LTS / No GPU |
