@@ -3,7 +3,7 @@
 **Black-box security assessment of NVIDIA NemoClaw v0.1.0 — AI agent sandbox architecture analysis**
 
 > Conducted within 24 hours of the platform's public release at GTC 2026 (March 16, 2026).  
-> This research is ongoing. Phase 1 (reconnaissance) is complete. Phases 2–4 are in progress.
+> This research is ongoing. Phases 1–2 are complete. Phases 3–4 are in progress.
 
 ---
 
@@ -22,13 +22,15 @@ This type of work aligns directly with what industry initiatives like [Anthropic
 | Phase | Focus | Status |
 |-------|-------|--------|
 | Phase 1 | Architecture mapping & defense layer enumeration | ✅ Complete |
-| Phase 2 | Gateway analysis & network policy bypass testing | 🔄 In progress |
+| Phase 2 | Gateway analysis & network policy bypass testing | ✅ Complete |
 | Phase 3 | Filesystem / Landlock boundary testing | 🔜 Planned |
 | Phase 4 | Prompt injection & agent behavior manipulation | 🔜 Planned |
 
 ---
 
-## Key Findings (Phase 1)
+## Key Findings
+
+### Phase 1 — Reconnaissance (March 2026)
 
 Five findings documented across the initial reconnaissance session:
 
@@ -40,7 +42,23 @@ Five findings documented across the initial reconnaissance session:
 | F-04 | No hardcoded credentials in distributed code | INFORMATIONAL (positive) |
 | F-05 | Minimal toolset limits post-exploitation capability | INFORMATIONAL |
 
-Full finding details, evidence, and security implications in [`/reports/NemoClaw_Security_Report_Phase1.md`](./reports/NemoClaw_Security_Report_Phase1.md).
+Full details in [`/reports/NemoClaw_Security_Report_Phase1.md`](/reports/NemoClaw_Security_Report_Phase1.md).
+
+### Phase 2 — Gateway & Network Policy (April 2026)
+
+Seven findings documented across gateway analysis and bypass testing:
+
+| ID | Title | Severity |
+|----|-------|----------|
+| F-06 | OpenShell 0.0.7 missing K8s secret during onboard | BUG |
+| F-07 | Gateway proxy architecture on port 3128 | INFORMATIONAL |
+| F-08 | Proxy resistant to common bypass techniques | INFORMATIONAL (positive) |
+| F-09 | Data channel via objects.githubusercontent.com | LOW |
+| F-10 | TLS MITM via OpenShell Sandbox CA | MEDIUM |
+| F-11 | mTLS client key protected by Landlock | INFORMATIONAL (positive) |
+| F-12 | Non-CONNECT HTTP methods blocked at proxy | INFORMATIONAL (positive) |
+
+Full details in [`/reports/NemoClaw_Security_Report_Phase2.md`](/reports/NemoClaw_Security_Report_Phase2.md).
 
 ---
 
@@ -56,7 +74,7 @@ Reconnaissance revealed a **Kubernetes-in-Docker** pattern not fully documented 
         ├── Inference proxy (inference.local)
         └── Sandbox pod 'cortana'  ← assessment entry point
             IP: 10.200.0.2/24
-            Gateway: 10.200.0.1 (OpenShell proxy)
+            Gateway: 10.200.0.1 (OpenShell proxy → port 3128)
             → NVIDIA Cloud API (internet)
 ```
 
@@ -65,12 +83,30 @@ Reconnaissance revealed a **Kubernetes-in-Docker** pattern not fully documented 
 | Layer | Mechanism | Status | Effectiveness |
 |-------|-----------|--------|---------------|
 | Filesystem | Landlock LSM (best_effort) | ACTIVE | High |
-| Syscalls | seccomp BPF (mode 2, 1 filter) | ACTIVE | High |
+| Syscalls | seccomp BPF (mode 2, 2 filters) | ACTIVE | High |
 | Privileges | Linux Capabilities (CapEff=0) | ACTIVE | High |
-| Network egress | netns + OpenShell proxy | ACTIVE | High |
+| Network egress | CONNECT-only proxy on :3128 | ACTIVE | High |
+| TLS inspection | MITM via OpenShell Sandbox CA | ACTIVE | High |
 | K3s isolation | Routing table restriction | ACTIVE | High |
 | Toolset | Minimal container image | ACTIVE | Medium |
 | Credentials | No hardcoded secrets | VERIFIED | High |
+
+### Network Policy Bypass Results (Phase 2)
+
+12 bypass techniques tested — all blocked or mitigated:
+
+| Technique | Result |
+|-----------|--------|
+| Host header spoofing | BLOCKED |
+| IP-based CONNECT | BLOCKED |
+| Non-standard ports | BLOCKED |
+| Subdomain wildcarding | PARTIAL (objects.githubusercontent.com allowed) |
+| SNI mismatch post-CONNECT | MITIGATED (by destination server) |
+| Post-CONNECT internal reach | BLOCKED |
+| Double CONNECT (nested tunnel) | BLOCKED |
+| Non-CONNECT HTTP methods | BLOCKED |
+| Data channel via GitHub CDN | OPEN (inherent to GitHub access) |
+| mTLS key extraction | BLOCKED (Landlock) |
 
 ---
 
@@ -78,11 +114,11 @@ Reconnaissance revealed a **Kubernetes-in-Docker** pattern not fully documented 
 
 Areas identified for deeper testing:
 
-- **OpenShell Gateway (10.200.0.1)** — all sandbox traffic transits here; gateway vulnerabilities could allow policy bypass without touching the sandbox
-- **Binary allowlist enforcement** — if enforcement uses process name rather than inode/cryptographic verification, substitution attacks may be viable
-- **Python3 as recon substitute** — `socket`, `subprocess`, `ctypes`, `os` modules partially replace absent system tools
-- **`/opt/nemoclaw` world-readable** — compiled TypeScript source accessible to sandbox user; warrants review as platform matures
-- **Prompt injection** — full attack surface of OpenClaw inherited; not yet tested
+* **Landlock boundary** — hardlink attacks, symlink traversal, `/proc` data channels, mTLS key extraction attempts
+* **Binary allowlist enforcement** — if enforcement uses process name rather than inode/cryptographic verification, substitution attacks may be viable
+* **Python3 as recon substitute** — `socket`, `subprocess`, `ctypes`, `os` modules partially replace absent system tools
+* **Prompt injection** — full attack surface of OpenClaw inherited; not yet tested
+* **Gateway compromise impact** — TLS MITM means gateway compromise exposes all sandbox HTTPS traffic
 
 ---
 
@@ -107,15 +143,23 @@ nemoclaw-security-research/
 ├── README.md                          ← You are here
 ├── reports/
 │   ├── NemoClaw_Security_Report_Phase1.md    ← Full Phase 1 report
+│   ├── NemoClaw_Security_Report_Phase2.md    ← Full Phase 2 report (NEW)
 │   └── findings/
 │       ├── F-01_k8s_token_mounted.md
 │       ├── F-02_k3s_network_isolation.md
 │       ├── F-03_pid1_capabilities.md
 │       ├── F-04_no_hardcoded_credentials.md
-│       └── F-05_minimal_toolset.md
+│       ├── F-05_minimal_toolset.md
+│       ├── F-06_missing_ssh_handshake_secret.md      (NEW)
+│       ├── F-07_gateway_proxy_architecture.md         (NEW)
+│       ├── F-08_proxy_bypass_resistance.md            (NEW)
+│       ├── F-09_data_channel_githubusercontent.md     (NEW)
+│       ├── F-10_tls_mitm_openshell_ca.md              (NEW)
+│       ├── F-11_mtls_key_landlock_protected.md        (NEW)
+│       └── F-12_non_connect_methods_blocked.md        (NEW)
 ├── methodology/
 │   ├── recon_approach.md              ← Black-box methodology used
-│   └── next_phases.md                 ← Planned test cases for Phases 2–4
+│   └── next_phases.md                 ← Planned test cases for Phases 3–4 (UPDATED)
 └── DISCLAIMER.md                      ← Responsible disclosure & research scope
 ```
 
@@ -126,6 +170,7 @@ nemoclaw-security-research/
 This project is part of a personal portfolio focused on AI security and Red Team research. The assessment was conducted in a self-hosted environment using publicly available software. No production systems were targeted. All testing was performed against a local installation under controlled conditions.
 
 **Researcher:** Mike  
+**Handle:** 0xgrimRPR  
 **Role:** Junior Cybersecurity Engineer | Red Team Track  
 **Active certifications in progress:** CEH Master, OSCP path  
 **Research focus:** AI agent security, sandbox escape vectors, autonomous system threat modeling
@@ -134,6 +179,6 @@ This project is part of a personal portfolio focused on AI security and Red Team
 
 ## Disclaimer
 
-This research is conducted for educational and professional development purposes. See [`DISCLAIMER.md`](./DISCLAIMER.md) for full responsible disclosure policy and scope statement.
+This research is conducted for educational and professional development purposes. See [`DISCLAIMER.md`](DISCLAIMER.md) for full responsible disclosure policy and scope statement.
 
 *NemoClaw is a trademark of NVIDIA Corporation. This project is not affiliated with or endorsed by NVIDIA.*

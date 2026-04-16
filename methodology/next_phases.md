@@ -1,63 +1,60 @@
-# Planned Testing — Phases 2–4
+# Next Phases — Planned Test Cases
 
-This document outlines the test cases planned for the next research sessions, based on the residual attack surface identified in Phase 1.
+> Updated: April 16, 2026 (post-Phase 2 completion)
 
----
+## Phase 3 — Filesystem / Landlock Boundary Testing
 
-## Phase 2 — Gateway Analysis
+**Status:** 🔜 Planned — Next session
 
-The OpenShell gateway at `10.200.0.1` is the single point of control for all sandbox egress. It handles inference interception, network policy enforcement, and egress proxying. A vulnerability here could allow policy bypass without touching the sandbox itself.
+### Test Cases
 
-**Test cases:**
+1. **Full path enumeration** — Python3 `os.walk()` from `/` to map all readable paths
+2. **Symlink traversal** — Create symlinks in `/tmp` pointing to restricted paths (`/etc/openshell-tls/client/tls.key`, K8s service account token)
+3. **Hardlink attacks** — Attempt hardlink creation against read-only paths (Landlock v1 known limitation: hardlinks may bypass read restrictions)
+4. **/proc data channel** — Read `/proc/1/environ`, `/proc/1/maps`, `/proc/1/cmdline` for gateway process information leakage
+5. **mTLS key indirect read** — Attempt to access `/etc/openshell-tls/client/tls.key` via `/proc`, symlink chains, or file descriptor manipulation
+6. **Writable path abuse** — Test if `/sandbox` or `/tmp` writable paths can influence gateway behavior
+7. **Landlock version detection** — Determine Landlock ABI version to identify known limitations
 
-- Port scan of `10.200.0.1` via Python3 socket to enumerate exposed services
-- Enumerate admin/health/metrics endpoints on the gateway (common paths: `/health`, `/metrics`, `/debug`, `/admin`)
-- Analyze headers added by the proxy to inference requests (potential info leakage)
-- Test whether the gateway validates the `Host` header or is vulnerable to host header injection
+### Key Questions
 
----
-
-## Phase 3 — Network Policy Bypass
-
-The network whitelist allows a defined set of endpoints by binary path and domain. The question is whether the enforcement mechanism can be circumvented.
-
-**Test cases:**
-
-- HTTP redirect following: does the gateway follow redirects to non-whitelisted hosts?
-- DNS rebinding via Python3 socket: resolve a controlled domain that returns a whitelisted IP
-- CONNECT tunnel attempt through a whitelisted endpoint (e.g., using `github.com` as a pivot)
-- TLS certificate validation behavior: does the proxy validate certificates, or can a MITM position be established?
-- Binary allowlist bypass: can a symlink or renamed binary pass the binary path check?
+- Can Landlock be bypassed via hardlink to read the mTLS key (F-11)?
+- Does `/proc/1/environ` leak the SSH handshake secret or other credentials?
+- Are there writable paths that influence sandbox behavior?
 
 ---
 
-## Phase 4 — Filesystem / Landlock Boundary Testing
+## Phase 4 — Prompt Injection & Agent Behavior Manipulation
 
-Landlock is configured in `best_effort` mode. This means if the kernel doesn't fully support a requested restriction, it silently degrades rather than failing closed. The goal is to probe the actual boundaries.
+**Status:** 🔜 Planned — Future session
 
-**Test cases:**
+### Test Cases
 
-- Full readable path enumeration via Python3 (map what the sandbox user can actually read)
-- Symlink traversal in `/tmp` toward restricted paths
-- Hardlink attempt against read-only paths (Landlock v1 does not restrict hardlinks in all configurations)
-- `/proc` as alternative data channel: can `/proc/1/environ`, `/proc/1/maps`, or `/proc/1/fd/*` yield useful information?
-- Test whether `/opt/nemoclaw/dist/` contains anything sensitive in newer versions
+1. **Direct system prompt override** — Inject instructions attempting to override the agent's system prompt
+2. **Indirect injection via files** — Place crafted content in `/sandbox` that the agent reads and follows
+3. **Agent-initiated exfiltration** — Manipulate agent to make requests to non-whitelisted hosts
+4. **System prompt extraction** — Conversational techniques to make the agent reveal its system prompt
+5. **Tool abuse** — Test if agent can be manipulated to use its tools (file write, code execution) maliciously
+6. **Policy boundary testing** — Can the agent be instructed to modify its own network policies?
 
----
+### Key Questions
 
-## Phase 5 — Prompt Injection & Agent Behavior
-
-This phase targets NemoClaw as an AI agent platform, not just as a sandbox. The attack surface is the agent's reasoning and instruction-following behavior.
-
-**Test cases:**
-
-- Direct system prompt override attempts via user-controlled input
-- Indirect injection via agent-readable files in `/sandbox` (e.g., a malicious README the agent reads)
-- Agent-initiated requests to non-whitelisted hosts via tool calls
-- System prompt extraction: can the agent be induced to reveal its instructions?
-- Chain-of-thought manipulation: can attacker input influence intermediate reasoning steps?
-- Tool call injection: if the agent can execute code, can injected input change what it executes?
+- Can prompt injection escape the network policy boundary?
+- Does the TLS MITM (F-10) provide sufficient visibility to detect injection attempts?
+- Can the agent be used as an unwitting proxy for attacks?
 
 ---
 
-*Updated: March 2026 | Based on Phase 1 findings*
+## Completed Phases
+
+### Phase 1 — Architecture Mapping & Defense Layer Enumeration ✅
+
+Completed March 17, 2026. See `reports/NemoClaw_Security_Report_Phase1.md`.
+
+Five findings (F-01 through F-05) documented. Kubernetes-in-Docker architecture mapped. All five defense layers verified as active.
+
+### Phase 2 — Gateway Analysis & Network Policy Bypass ✅
+
+Completed April 16, 2026. See `reports/NemoClaw_Security_Report_Phase2.md`.
+
+Seven findings (F-06 through F-12) documented. Gateway proxy architecture on port 3128 discovered. TLS MITM via OpenShell Sandbox CA confirmed. All bypass techniques blocked or mitigated. One blocking onboarding bug (F-06) identified.
