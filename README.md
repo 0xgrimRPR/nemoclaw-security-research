@@ -1,9 +1,9 @@
 # NemoClaw Security Research
 
-**Black-box security assessment of NVIDIA NemoClaw v0.1.0 — AI agent sandbox architecture analysis**
+**Black-box security assessment of NVIDIA NemoClaw — AI agent sandbox architecture analysis**
 
 > Conducted within 24 hours of the platform's public release at GTC 2026 (March 16, 2026).  
-> This research is ongoing. Phases 1–2 are complete. Phases 3–4 are in progress.
+> This research is ongoing. Phases 1–3 are complete. Phase 4 is in progress.
 
 ---
 
@@ -23,7 +23,7 @@ This type of work aligns directly with what industry initiatives like [Anthropic
 |-------|-------|--------|
 | Phase 1 | Architecture mapping & defense layer enumeration | ✅ Complete |
 | Phase 2 | Gateway analysis & network policy bypass testing | ✅ Complete |
-| Phase 3 | Filesystem / Landlock boundary testing | 🔜 Planned |
+| Phase 3 | Filesystem / Landlock boundary testing | ✅ Complete |
 | Phase 4 | Prompt injection & agent behavior manipulation | 🔜 Planned |
 
 ---
@@ -60,6 +60,25 @@ Seven findings documented across gateway analysis and bypass testing:
 
 Full details in [`/reports/NemoClaw_Security_Report_Phase2.md`](/reports/NemoClaw_Security_Report_Phase2.md).
 
+### Phase 3 — Filesystem / Landlock Boundary (May 2026)
+
+Ten findings documented across filesystem access, symlink/hardlink attacks, procfs analysis, and privilege controls:
+
+| ID | Title | Severity |
+|----|-------|----------|
+| F-13 | Root directory not listable (Landlock) | INFORMATIONAL (positive) |
+| F-14 | /proc/self/environ readable but no secrets | INFORMATIONAL (positive) |
+| F-15 | Symlink traversal blocked by Landlock | INFORMATIONAL (positive) |
+| F-16 | Hardlink attacks blocked (cross-device + kernel) | INFORMATIONAL (positive) |
+| F-17 | PID 1 cmdline/status readable (info leak) | LOW |
+| F-18 | NODE_OPTIONS safety scripts read-only | INFORMATIONAL (positive) |
+| F-19 | DNS changed to direct proxy at 10.200.0.1 | INFORMATIONAL |
+| F-20 | Agent state writable (/sandbox/.openclaw/) | LOW |
+| F-21 | Seccomp increased to 3 BPF filters | INFORMATIONAL (positive) |
+| F-22 | NoNewPrivs=1 enforced | INFORMATIONAL (positive) |
+
+Full details in [`/reports/NemoClaw_Security_Report_Phase3.md`](/reports/NemoClaw_Security_Report_Phase3.md).
+
 ---
 
 ## Architecture Discovered
@@ -70,7 +89,7 @@ Reconnaissance revealed a **Kubernetes-in-Docker** pattern not fully documented 
 [Host VM: Ubuntu 22.04]
 └── Docker container (OpenShell Gateway)
     └── K3s cluster (Kubernetes lightweight)
-        ├── CoreDNS (10.43.0.10)
+        ├── DNS proxy (10.200.0.1)
         ├── Inference proxy (inference.local)
         └── Sandbox pod 'cortana'  ← assessment entry point
             IP: 10.200.0.2/24
@@ -83,13 +102,15 @@ Reconnaissance revealed a **Kubernetes-in-Docker** pattern not fully documented 
 | Layer | Mechanism | Status | Effectiveness |
 |-------|-----------|--------|---------------|
 | Filesystem | Landlock LSM (best_effort) | ACTIVE | High |
-| Syscalls | seccomp BPF (mode 2, 2 filters) | ACTIVE | High |
-| Privileges | Linux Capabilities (CapEff=0) | ACTIVE | High |
+| Syscalls | seccomp BPF (mode 2, 3 filters) | ACTIVE | High |
+| Privileges | Linux Capabilities (CapEff=0) + NoNewPrivs | ACTIVE | High |
 | Network egress | CONNECT-only proxy on :3128 | ACTIVE | High |
 | TLS inspection | MITM via OpenShell Sandbox CA | ACTIVE | High |
+| DNS | Direct proxy (10.200.0.1) | ACTIVE | High |
 | K3s isolation | Routing table restriction | ACTIVE | High |
 | Toolset | Minimal container image | ACTIVE | Medium |
 | Credentials | No hardcoded secrets | VERIFIED | High |
+| Runtime safety | Node.js scripts via NODE_OPTIONS (read-only) | ACTIVE | High |
 
 ### Network Policy Bypass Results (Phase 2)
 
@@ -108,17 +129,28 @@ Reconnaissance revealed a **Kubernetes-in-Docker** pattern not fully documented 
 | Data channel via GitHub CDN | OPEN (inherent to GitHub access) |
 | mTLS key extraction | BLOCKED (Landlock) |
 
+### Filesystem Boundary Results (Phase 3)
+
+| Test | Result |
+|------|--------|
+| Root directory listing | BLOCKED (Landlock) |
+| Symlink traversal to restricted paths | BLOCKED |
+| Hardlink attacks | BLOCKED (cross-device + kernel) |
+| /proc/1/environ access | BLOCKED |
+| Safety script modification | BLOCKED (read-only) |
+| Agent state file access | WRITABLE (Phase 4 target) |
+
 ---
 
-## Residual Attack Surface (Next Phases)
+## Residual Attack Surface (Next Phase)
 
 Areas identified for deeper testing:
 
-* **Landlock boundary** — hardlink attacks, symlink traversal, `/proc` data channels, mTLS key extraction attempts
-* **Binary allowlist enforcement** — if enforcement uses process name rather than inode/cryptographic verification, substitution attacks may be viable
-* **Python3 as recon substitute** — `socket`, `subprocess`, `ctypes`, `os` modules partially replace absent system tools
-* **Prompt injection** — full attack surface of OpenClaw inherited; not yet tested
-* **Gateway compromise impact** — TLS MITM means gateway compromise exposes all sandbox HTTPS traffic
+* **Prompt injection via agent state** — `/sandbox/.openclaw/` files are writable; memory database, session transcripts, and model config can be modified (F-20)
+* **System prompt extraction** — attempt to extract via conversation manipulation
+* **Agent behavior manipulation** — inject false memories via `main.sqlite`, alter session context
+* **Safety script analysis** — understand runtime restrictions imposed by the Node.js safety net
+* **Workflow registry injection** — modify `registry.sqlite` to trigger unintended agent actions
 
 ---
 
@@ -129,8 +161,8 @@ Areas identified for deeper testing:
 | Host OS | Ubuntu 22.04 LTS (VMware) |
 | Docker | Running, socket accessible to sandbox group |
 | Node.js | v22.20.1 |
-| OpenShell | v0.0.7 (PyPI via uv) |
-| NemoClaw | v0.1.0 (cloned from source) |
+| OpenShell | v0.0.36 (PyPI via uv) |
+| NemoClaw | v0.0.38 (updated from v0.1.0) |
 | Inference | NVIDIA Cloud API — Nemotron 3 Super 120B |
 | Sandbox name | cortana |
 
@@ -142,25 +174,36 @@ Areas identified for deeper testing:
 nemoclaw-security-research/
 ├── README.md                          ← You are here
 ├── reports/
-│   ├── NemoClaw_Security_Report_Phase1.md    ← Full Phase 1 report
-│   ├── NemoClaw_Security_Report_Phase2.md    ← Full Phase 2 report (NEW)
+│   ├── NemoClaw_Security_Report_Phase1.md
+│   ├── NemoClaw_Security_Report_Phase2.md
+│   ├── NemoClaw_Security_Report_Phase3.md           (NEW)
 │   └── findings/
 │       ├── F-01_k8s_token_mounted.md
 │       ├── F-02_k3s_network_isolation.md
 │       ├── F-03_pid1_capabilities.md
 │       ├── F-04_no_hardcoded_credentials.md
 │       ├── F-05_minimal_toolset.md
-│       ├── F-06_missing_ssh_handshake_secret.md      (NEW)
-│       ├── F-07_gateway_proxy_architecture.md         (NEW)
-│       ├── F-08_proxy_bypass_resistance.md            (NEW)
-│       ├── F-09_data_channel_githubusercontent.md     (NEW)
-│       ├── F-10_tls_mitm_openshell_ca.md              (NEW)
-│       ├── F-11_mtls_key_landlock_protected.md        (NEW)
-│       └── F-12_non_connect_methods_blocked.md        (NEW)
+│       ├── F-06_missing_ssh_handshake_secret.md
+│       ├── F-07_gateway_proxy_architecture.md
+│       ├── F-08_proxy_bypass_resistance.md
+│       ├── F-09_data_channel_githubusercontent.md
+│       ├── F-10_tls_mitm_openshell_ca.md
+│       ├── F-11_mtls_key_landlock_protected.md
+│       ├── F-12_non_connect_methods_blocked.md
+│       ├── F-13_root_dir_not_listable.md              (NEW)
+│       ├── F-14_environ_no_secrets.md                  (NEW)
+│       ├── F-15_symlink_traversal_blocked.md           (NEW)
+│       ├── F-16_hardlink_attacks_blocked.md            (NEW)
+│       ├── F-17_pid1_info_leak.md                      (NEW)
+│       ├── F-18_safety_scripts_readonly.md             (NEW)
+│       ├── F-19_dns_proxy_change.md                    (NEW)
+│       ├── F-20_agent_state_writable.md                (NEW)
+│       ├── F-21_seccomp_three_filters.md               (NEW)
+│       └── F-22_nonewprivs_enforced.md                 (NEW)
 ├── methodology/
-│   ├── recon_approach.md              ← Black-box methodology used
-│   └── next_phases.md                 ← Planned test cases for Phases 3–4 (UPDATED)
-└── DISCLAIMER.md                      ← Responsible disclosure & research scope
+│   ├── recon_approach.md
+│   └── next_phases.md
+└── DISCLAIMER.md
 ```
 
 ---
