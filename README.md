@@ -3,7 +3,7 @@
 **Black-box security assessment of NVIDIA NemoClaw — AI agent sandbox architecture analysis**
 
 > Conducted within 24 hours of the platform's public release at GTC 2026 (March 16, 2026).  
-> This research is ongoing. Phases 1–3 are complete. Phase 4 is in progress.
+> This research is complete. All four phases (reconnaissance → prompt injection) have been executed.
 
 ---
 
@@ -24,7 +24,7 @@ This type of work aligns directly with what industry initiatives like [Anthropic
 | Phase 1 | Architecture mapping & defense layer enumeration | ✅ Complete |
 | Phase 2 | Gateway analysis & network policy bypass testing | ✅ Complete |
 | Phase 3 | Filesystem / Landlock boundary testing | ✅ Complete |
-| Phase 4 | Prompt injection & agent behavior manipulation | 🔜 Planned |
+| Phase 4 | Prompt injection & agent behavior manipulation | ✅ Complete |
 
 ---
 
@@ -79,6 +79,21 @@ Ten findings documented across filesystem access, symlink/hardlink attacks, proc
 
 Full details in [`/reports/NemoClaw_Security_Report_Phase3.md`](/reports/NemoClaw_Security_Report_Phase3.md).
 
+### Phase 4 — Prompt Injection & Agent Behavior Manipulation (May 2026)
+
+Six findings documented across prompt injection testing, memory poisoning, and egress exfiltration:
+
+| ID | Title | Severity |
+|----|-------|----------|
+| F-23 | Indirect prompt injection via docstring → credential disclosure | HIGH |
+| F-24 | Operator token + private key accessible within sandbox | MEDIUM |
+| F-25 | Device authentication disabled by default | MEDIUM |
+| F-26 | Agent detects injection but completes task first | LOW |
+| F-27 | Session-level memory poisoning → autonomous credential disclosure | HIGH |
+| F-28 | Agent prepares exfiltration payload for allowed egress endpoint | HIGH |
+
+Full details in [`/reports/NemoClaw_Security_Report_Phase4.md`](/reports/NemoClaw_Security_Report_Phase4.md).
+
 ---
 
 ## Architecture Discovered
@@ -112,45 +127,27 @@ Reconnaissance revealed a **Kubernetes-in-Docker** pattern not fully documented 
 | Credentials | No hardcoded secrets | VERIFIED | High |
 | Runtime safety | Node.js scripts via NODE_OPTIONS (read-only) | ACTIVE | High |
 
-### Network Policy Bypass Results (Phase 2)
+### Key Assessment Results by Phase
 
-12 bypass techniques tested — all blocked or mitigated:
+**Phase 2 — Network Policy Bypass:** 12 bypass techniques tested, all blocked or mitigated. One data channel identified via GitHub CDN (F-09).
 
-| Technique | Result |
-|-----------|--------|
-| Host header spoofing | BLOCKED |
-| IP-based CONNECT | BLOCKED |
-| Non-standard ports | BLOCKED |
-| Subdomain wildcarding | PARTIAL (objects.githubusercontent.com allowed) |
-| SNI mismatch post-CONNECT | MITIGATED (by destination server) |
-| Post-CONNECT internal reach | BLOCKED |
-| Double CONNECT (nested tunnel) | BLOCKED |
-| Non-CONNECT HTTP methods | BLOCKED |
-| Data channel via GitHub CDN | OPEN (inherent to GitHub access) |
-| mTLS key extraction | BLOCKED (Landlock) |
+**Phase 3 — Filesystem Boundary:** Symlink traversal, hardlink attacks, and procfs enumeration all blocked by Landlock. Agent state files writable (F-20) — confirmed exploitable in Phase 4.
 
-### Filesystem Boundary Results (Phase 3)
-
-| Test | Result |
-|------|--------|
-| Root directory listing | BLOCKED (Landlock) |
-| Symlink traversal to restricted paths | BLOCKED |
-| Hardlink attacks | BLOCKED (cross-device + kernel) |
-| /proc/1/environ access | BLOCKED |
-| Safety script modification | BLOCKED (read-only) |
-| Agent state file access | WRITABLE (Phase 4 target) |
+**Phase 4 — Prompt Injection:** 6 tests executed. Agent blocked obvious injection (T-01, T-02) but compromised by contextual injection (T-03), direct memory poisoning (T-04/T-05), and egress exfiltration prep (T-06). Three HIGH findings. Complete attack chain demonstrated from planted file to exfiltration-ready payload.
 
 ---
 
-## Residual Attack Surface (Next Phase)
+## Project-Wide Conclusions
 
-Areas identified for deeper testing:
+### What NemoClaw Gets Right
 
-* **Prompt injection via agent state** — `/sandbox/.openclaw/` files are writable; memory database, session transcripts, and model config can be modified (F-20)
-* **System prompt extraction** — attempt to extract via conversation manipulation
-* **Agent behavior manipulation** — inject false memories via `main.sqlite`, alter session context
-* **Safety script analysis** — understand runtime restrictions imposed by the Node.js safety net
-* **Workflow registry injection** — modify `registry.sqlite` to trigger unintended agent actions
+NemoClaw demonstrates one of the most thoughtful approaches to AI agent sandboxing in 2026. Six independent infrastructure layers create meaningful barriers to sandbox escape. Phases 1–3 confirmed all infrastructure controls function as intended.
+
+### The Fundamental Gap
+
+Despite robust infrastructure, a critical gap exists between **protecting the host from the agent** and **protecting the agent's data from the agent itself**. The agent has legitimate access to credentials, can be manipulated into disclosing them, and can prepare exfiltration payloads targeting allowed egress endpoints. No security control at any layer addresses this path.
+
+This is not NemoClaw-specific — it is a structural challenge for all AI agent platforms.
 
 ---
 
@@ -162,7 +159,8 @@ Areas identified for deeper testing:
 | Docker | Running, socket accessible to sandbox group |
 | Node.js | v22.20.1 |
 | OpenShell | v0.0.36 (PyPI via uv) |
-| NemoClaw | v0.0.38 (updated from v0.1.0) |
+| NemoClaw | v0.0.38 / v0.1.0 |
+| OpenClaw | 2026.4.24 (cbcfdf6) |
 | Inference | NVIDIA Cloud API — Nemotron 3 Super 120B |
 | Sandbox name | cortana |
 
@@ -176,30 +174,16 @@ nemoclaw-security-research/
 ├── reports/
 │   ├── NemoClaw_Security_Report_Phase1.md
 │   ├── NemoClaw_Security_Report_Phase2.md
-│   ├── NemoClaw_Security_Report_Phase3.md           (NEW)
+│   ├── NemoClaw_Security_Report_Phase3.md
+│   ├── NemoClaw_Security_Report_Phase4.md           (NEW)
 │   └── findings/
-│       ├── F-01_k8s_token_mounted.md
-│       ├── F-02_k3s_network_isolation.md
-│       ├── F-03_pid1_capabilities.md
-│       ├── F-04_no_hardcoded_credentials.md
-│       ├── F-05_minimal_toolset.md
-│       ├── F-06_missing_ssh_handshake_secret.md
-│       ├── F-07_gateway_proxy_architecture.md
-│       ├── F-08_proxy_bypass_resistance.md
-│       ├── F-09_data_channel_githubusercontent.md
-│       ├── F-10_tls_mitm_openshell_ca.md
-│       ├── F-11_mtls_key_landlock_protected.md
-│       ├── F-12_non_connect_methods_blocked.md
-│       ├── F-13_root_dir_not_listable.md              (NEW)
-│       ├── F-14_environ_no_secrets.md                  (NEW)
-│       ├── F-15_symlink_traversal_blocked.md           (NEW)
-│       ├── F-16_hardlink_attacks_blocked.md            (NEW)
-│       ├── F-17_pid1_info_leak.md                      (NEW)
-│       ├── F-18_safety_scripts_readonly.md             (NEW)
-│       ├── F-19_dns_proxy_change.md                    (NEW)
-│       ├── F-20_agent_state_writable.md                (NEW)
-│       ├── F-21_seccomp_three_filters.md               (NEW)
-│       └── F-22_nonewprivs_enforced.md                 (NEW)
+│       ├── F-01 through F-22                        (Phases 1–3)
+│       ├── F-23_prompt_injection_credential_disclosure.md    (NEW)
+│       ├── F-24_operator_token_accessible.md                 (NEW)
+│       ├── F-25_device_auth_disabled.md                      (NEW)
+│       ├── F-26_injection_detected_task_completed.md         (NEW)
+│       ├── F-27_session_memory_poisoning.md                  (NEW)
+│       └── F-28_exfiltration_payload_prepared.md             (NEW)
 ├── methodology/
 │   ├── recon_approach.md
 │   └── next_phases.md
