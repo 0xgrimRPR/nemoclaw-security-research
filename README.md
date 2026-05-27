@@ -129,6 +129,8 @@ Reconnaissance revealed a **Kubernetes-in-Docker** pattern not fully documented 
 
 ### Key Assessment Results by Phase
 
+**Phase 1 — Reconnaissance:** Kubernetes-in-Docker architecture mapped. Six defense layers identified and verified as active. K8s service account token mounted but protected by Landlock (F-01). No hardcoded credentials found (F-04). Minimal toolset confirmed (F-05).
+
 **Phase 2 — Network Policy Bypass:** 12 bypass techniques tested, all blocked or mitigated. One data channel identified via GitHub CDN (F-09).
 
 **Phase 3 — Filesystem Boundary:** Symlink traversal, hardlink attacks, and procfs enumeration all blocked by Landlock. Agent state files writable (F-20) — confirmed exploitable in Phase 4.
@@ -175,15 +177,15 @@ nemoclaw-security-research/
 │   ├── NemoClaw_Security_Report_Phase1.md
 │   ├── NemoClaw_Security_Report_Phase2.md
 │   ├── NemoClaw_Security_Report_Phase3.md
-│   ├── NemoClaw_Security_Report_Phase4.md           (NEW)
+│   ├── NemoClaw_Security_Report_Phase4.md
 │   └── findings/
 │       ├── F-01 through F-22                        (Phases 1–3)
-│       ├── F-23_prompt_injection_credential_disclosure.md    (NEW)
-│       ├── F-24_operator_token_accessible.md                 (NEW)
-│       ├── F-25_device_auth_disabled.md                      (NEW)
-│       ├── F-26_injection_detected_task_completed.md         (NEW)
-│       ├── F-27_session_memory_poisoning.md                  (NEW)
-│       └── F-28_exfiltration_payload_prepared.md             (NEW)
+│       ├── F-23_prompt_injection_credential_disclosure.md
+│       ├── F-24_operator_token_accessible.md
+│       ├── F-25_device_auth_disabled.md
+│       ├── F-26_injection_detected_task_completed.md
+│       ├── F-27_session_memory_poisoning.md
+│       └── F-28_exfiltration_payload_prepared.md
 ├── methodology/
 │   ├── recon_approach.md
 │   └── next_phases.md
