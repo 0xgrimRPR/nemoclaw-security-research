@@ -7,7 +7,7 @@
 | Date | April 16, 2026 |
 | Analyst | 0xgrimRPR |
 | Role | Junior Cybersecurity Engineer / Red Team Track |
-| Target | NVIDIA NemoClaw v0.1.0 + OpenShell 0.0.7 |
+| Target | NVIDIA NemoClaw 0.0.x (early preview) + OpenShell 0.0.7 |
 | Environment | VMware VM / Ubuntu 22.04 LTS / No GPU |
 | Scope | Gateway analysis & network policy bypass |
 | Classification | Research Use Only |
@@ -17,7 +17,7 @@
 
 ## 1. Executive Summary
 
-This report documents Phase 1 (Gateway Analysis) and Phase 2 (Network Policy Bypass) testing of NVIDIA NemoClaw, continuing the black-box security reconnaissance initiated in Report #1 (March 17, 2026). Testing was conducted on April 16, 2026, approximately one month after the initial assessment.
+This report documents two parts of the overall Phase 2 assessment — Part A (Gateway Analysis) and Part B (Network Policy Bypass) — continuing the security reconnaissance initiated in Report #1 (March 17, 2026). Testing was conducted on April 16, 2026, approximately one month after the initial assessment.
 
 During environment setup, a reproducible bug was discovered in OpenShell 0.0.7: the onboarding and gateway provisioning processes fail to create a required Kubernetes secret (`openshell-ssh-handshake`), preventing sandbox initialization. This bug was manually remediated to proceed with testing.
 
@@ -41,7 +41,7 @@ Network policy bypass testing confirmed that the proxy is resistant to common ev
 
 ---
 
-## 3. Gateway Analysis (Phase 1 Testing)
+## 3. Gateway Analysis (Part A)
 
 ### 3.1 Gateway Architecture Discovery
 
@@ -137,9 +137,9 @@ The TLS MITM architecture means the gateway has full visibility into all HTTPS r
 
 ---
 
-## 5. Network Policy Bypass Testing (Phase 2)
+## 5. Network Policy Bypass Testing (Part B)
 
-Twelve bypass techniques were tested against the proxy policy engine. All bypass attempts were unsuccessful, confirming robust policy enforcement.
+Twelve bypass techniques were tested against the proxy policy engine. Ten were blocked or mitigated; two endpoints (the objects.githubusercontent.com data channel and the GitHub API) were permitted by policy and are tracked separately (F-09). No policy-restricted destination was reached.
 
 | # | Technique | Result | Details |
 |---|-----------|--------|---------|
@@ -208,7 +208,7 @@ https_proxy=http://10.200.0.1:3128
 
 ### F-08 — Proxy Resistant to Common Bypass Techniques [INFORMATIONAL]
 
-**Description:** The proxy policy engine was tested against 10 bypass techniques: Host header spoofing, IP-based CONNECT, non-standard ports, subdomain wildcarding, SNI mismatch, post-CONNECT internal reach, nested CONNECT, non-CONNECT methods, and more. All techniques were blocked or mitigated.
+**Description:** The proxy policy engine was tested against twelve bypass techniques (Host header spoofing, IP-based CONNECT, non-standard ports, subdomain wildcarding, SNI mismatch, post-CONNECT internal reach, nested CONNECT, non-CONNECT methods, and more). Ten were blocked or mitigated; two endpoints were permitted by policy and are tracked separately (F-09).
 
 **Evidence:**
 
@@ -337,7 +337,7 @@ DELETE http://github.com/ HTTP/1.1 → 403 Forbidden
 
 ## 9. Conclusions
 
-Phase 1 and Phase 2 testing confirms that the OpenShell gateway implements a well-designed network security boundary. The CONNECT-only proxy with hostname:port exact matching, combined with TLS MITM inspection, creates a comprehensive traffic control layer that resisted all tested bypass techniques.
+Part A and Part B testing confirms that the OpenShell gateway implements a well-designed network security boundary. The CONNECT-only proxy with hostname:port exact matching, combined with TLS MITM inspection, creates a comprehensive traffic control layer that resisted all tested bypass techniques.
 
 The most significant finding is the TLS MITM architecture (F-10), which is a deliberate design choice rather than a vulnerability. It provides the gateway with full traffic visibility, enabling future fine-grained controls (e.g., HTTP method restrictions per endpoint, request body inspection). However, it also means the gateway is a high-value target — its compromise would expose all sandbox HTTPS traffic.
 
@@ -347,6 +347,6 @@ Overall, the network security controls continue to demonstrate maturity beyond w
 
 ---
 
-*Report generated: April 16, 2026 | NemoClaw v0.1.0 + OpenShell 0.0.7 | For research purposes only*
+*Report generated: April 16, 2026 | NemoClaw 0.0.x (early preview) + OpenShell 0.0.7 | For research purposes only*
 
 *Nota: Este reporte es continuación de NemoClaw_Security_Report_Phase1.md. Las fases 3 y 4 se documentarán en reportes subsecuentes.*
