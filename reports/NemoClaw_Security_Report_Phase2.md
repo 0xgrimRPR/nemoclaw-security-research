@@ -298,17 +298,17 @@ DELETE http://github.com/ HTTP/1.1 → 403 Forbidden
 | ID | Finding | Severity | Report |
 |----|---------|----------|--------|
 | F-01 | K8s Service Account Token Mounted but Inaccessible | LOW | #1 (March) |
-| F-02 | K3s Internal Network Unreachable from Sandbox | INFO | #1 (March) |
-| F-03 | PID 1 Runs as Root with Non-Zero Capabilities | INFO | #1 (March) |
-| F-04 | No Hardcoded Credentials in Distributed Code | INFO | #1 (March) |
-| F-05 | Minimal Toolset Limits Post-Exploitation | INFO | #1 (March) |
+| F-02 | K3s Internal Network Unreachable from Sandbox | INFORMATIONAL | #1 (March) |
+| F-03 | PID 1 Runs as Root with Non-Zero Capabilities | INFORMATIONAL | #1 (March) |
+| F-04 | No Hardcoded Credentials in Distributed Code | INFORMATIONAL | #1 (March) |
+| F-05 | Minimal Toolset Limits Post-Exploitation | INFORMATIONAL | #1 (March) |
 | F-06 | OpenShell 0.0.7 Missing K8s Secret During Onboard | BUG | #2 (April) |
-| F-07 | Gateway Proxy Architecture on Port 3128 | INFO | #2 (April) |
-| F-08 | Proxy Resistant to Common Bypass Techniques | INFO | #2 (April) |
+| F-07 | Gateway Proxy Architecture on Port 3128 | INFORMATIONAL | #2 (April) |
+| F-08 | Proxy Resistant to Common Bypass Techniques | INFORMATIONAL | #2 (April) |
 | F-09 | Data Channel via objects.githubusercontent.com | LOW | #2 (April) |
 | F-10 | TLS MITM via OpenShell Sandbox CA | MEDIUM | #2 (April) |
-| F-11 | mTLS Client Key Protected by Landlock | INFO | #2 (April) |
-| F-12 | Non-CONNECT HTTP Methods Blocked at Proxy | INFO | #2 (April) |
+| F-11 | mTLS Client Key Protected by Landlock | INFORMATIONAL | #2 (April) |
+| F-12 | Non-CONNECT HTTP Methods Blocked at Proxy | INFORMATIONAL | #2 (April) |
 
 ---
 
