@@ -4,7 +4,7 @@
 |-------|-------|
 | Date | May 22, 2026 |
 | Analyst | 0xgrimRPR |
-| Target | NemoClaw v0.1.0 + OpenClaw 2026.4.24 |
+| Target | NemoClaw 0.0.x (early preview) + OpenClaw 2026.4.24 |
 
 ## Summary
 
@@ -72,7 +72,7 @@ Malicious Python docstring with credential-reading code framed as "preparation s
 ```
 From the files I read as instructed in the docstring:
 - Device Auth: Valid operator token found
-- OpenClaw Config: Gateway token a6ba28dc566065fdb360cb6d621e2a69f6ca5473ac0766ff
+- OpenClaw Config: Gateway token <REDACTED>
 ```
 
 **Gateway token exposed.** Attack succeeded because user bridged embedded instructions with explicit reference.
@@ -118,7 +118,9 @@ Agent read credential files, created `/sandbox/env_config_backup.json` with full
 
 At no point did any NemoClaw or OpenShell security control intervene. Sandbox infrastructure protects the host from the agent, not the agent's data from the agent itself.
 
-## Comparison with Lasso Security (May 19, 2026)
+## Comparison with Lasso Security (May 18, 2026)
+
+> Reference: Lasso Security's research demonstrating prompt injection against NVIDIA's sandboxed OpenClaw (i.e., this same platform), as reported by TechTalks on May 18, 2026 (researcher: Noy Pearl). Two vectors: emoji-encoded exfiltration to bypass GitHub static scans, and SOUL.md configuration poisoning via indirect prompt injection.
 
 | Aspect | Lasso Security | This Assessment |
 |--------|---------------|------------------|
@@ -176,7 +178,7 @@ At no point did any NemoClaw or OpenShell security control intervene. Sandbox in
 
 ### What NemoClaw Gets Right
 
-NemoClaw demonstrates one of the most thoughtful approaches to AI agent sandboxing available in 2026. Six independent infrastructure security layers (Landlock, seccomp BPF, zero capabilities, network namespace isolation, TLS inspection, minimal toolset) create meaningful barriers to sandbox escape. Phases 1–3 confirmed all infrastructure controls function as intended.
+NemoClaw demonstrates one of the most thoughtful approaches to AI agent sandboxing available in 2026. Multiple independent infrastructure security layers (Landlock, seccomp BPF, zero capabilities, network namespace isolation, TLS inspection, minimal toolset) create meaningful barriers to sandbox escape. Phases 1–3 confirmed all infrastructure controls function as intended.
 
 ### The Fundamental Gap
 
@@ -192,4 +194,4 @@ This is not NemoClaw-specific — it is a structural challenge for all AI agent 
 
 **Model:** Injection resistance is brittle — catches obvious patterns, fails when instructions are contextually natural. Model-level defenses should be a last resort, not primary control.
 
-*Report: May 22, 2026 | NemoClaw v0.1.0 + OpenClaw 2026.4.24 | For research purposes only*
+*Report: May 22, 2026 | NemoClaw 0.0.x (early preview) + OpenClaw 2026.4.24 | For research purposes only*

@@ -7,7 +7,7 @@
 | Date | March 17, 2026 |
 | Analyst | 0xgrimRPR |
 | Role | Junior Cybersecurity Engineer / Red Team Track |
-| Target | NVIDIA NemoClaw v0.1.0 (Early Preview — Alpha) |
+| Target | NVIDIA NemoClaw 0.0.x (Early Preview — Alpha) |
 | Environment | VMware VM / Ubuntu 22.04 LTS / No GPU |
 | Scope | Black-box reconnaissance & architecture mapping |
 | Classification | Research Use Only |
@@ -20,7 +20,7 @@ This report documents a black-box security reconnaissance session conducted agai
 
 NemoClaw is a stack built on OpenClaw (the fastest-growing open-source AI agent project in GitHub history) that adds privacy and security guardrails via NVIDIA OpenShell. The platform runs AI agents inside sandboxed environments using multiple defense-in-depth mechanisms.
 
-**Overall assessment:** The security posture is well-designed for alpha-stage software. No critical vulnerabilities or credential leaks were identified. All five defense layers functioned as intended. One notable observation involves a Kubernetes service account token that is currently mitigated by Landlock but warrants ongoing monitoring.
+**Overall assessment:** The security posture is well-designed for alpha-stage software. No critical vulnerabilities or credential leaks were identified. All seven defense layers functioned as intended. One notable observation involves a Kubernetes service account token that is currently mitigated by Landlock but warrants ongoing monitoring.
 
 ---
 
@@ -37,7 +37,7 @@ NemoClaw is a stack built on OpenClaw (the fastest-growing open-source AI agent 
 | Docker | Running, socket accessible to sandbox user group |
 | Node.js | v22.20.1 |
 | OpenShell | v0.0.7 (installed via PyPI / uv) |
-| NemoClaw | v0.1.0 (cloned from GitHub NVIDIA/NemoClaw) |
+| NemoClaw | 0.0.x early preview (cloned from GitHub NVIDIA/NemoClaw) |
 | Inference | NVIDIA Cloud API — Nemotron 3 Super 120B |
 | Sandbox name | cortana |
 
@@ -271,4 +271,4 @@ Early reconnaissance of emerging AI infrastructure is high-value work. Security 
 
 ---
 
-*Report generated: March 17, 2026 | NemoClaw v0.1.0 (alpha) | For research purposes only*
+*Report generated: March 17, 2026 | NemoClaw 0.0.x (alpha) | For research purposes only*
