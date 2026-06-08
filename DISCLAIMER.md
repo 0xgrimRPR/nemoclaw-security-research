@@ -2,11 +2,11 @@
 
 ## Scope Statement
 
-This research was conducted against a **local, self-hosted installation** of NVIDIA NemoClaw v0.1.0, running in a dedicated VMware virtual machine under the researcher's full control.
+This research was conducted against a **local, self-hosted installation** of NVIDIA NemoClaw (0.0.x early preview), running in a dedicated VMware virtual machine under the researcher's full control.
 
 - No production systems were targeted
 - No NVIDIA infrastructure was accessed beyond the intended public NVIDIA Cloud API endpoint (used exactly as documented for model inference)
-- No credentials, tokens, or access belonging to third parties were accessed or retained
+- No credentials, tokens, or access belonging to third parties were accessed or retained. Credential values observed inside the local sandbox (the researcher's own throwaway instance) are redacted in published evidence.
 - All testing was performed in an isolated local environment
 
 ## Intent
@@ -19,16 +19,22 @@ The goal of this research is to understand the security architecture of an emerg
 
 ## Findings Disposition
 
-All findings in this repository are either:
+Findings in this repository span the full severity range:
 
-- **Informational / positive findings** — documenting controls that work as intended
-- **Low severity** — mitigated by existing controls, with a recommendation to monitor
+- **Informational / positive** — controls working as intended (the majority of Phases 1–3)
+- **Low** — mitigated by existing controls, with a recommendation to monitor (e.g., F-01, F-09, F-17, F-20, F-26)
+- **Medium** — F-10 (TLS MITM design trade-off), F-24, F-25
+- **High** — F-23, F-27, F-28 (Phase 4: prompt-injection-driven credential disclosure and preparation of an exfiltration payload)
 
-No critical or high-severity vulnerabilities were identified in Phase 1. If critical findings are discovered in future phases, they will be reported to NVIDIA's security team via their responsible disclosure process before public disclosure.
+The Medium and High findings concern a structural class of AI-agent risk — the agent's own legitimate access to the credentials it needs to operate — that is **not unique to NemoClaw** and has been documented publicly by independent researchers (e.g., Lasso Security, May 2026).
 
-## NVIDIA Security Contact
+## Disclosure
 
-NVIDIA's vulnerability disclosure program: https://www.nvidia.com/en-us/security/
+This research was performed against a local, self-hosted, open-source preview and targeted no third-party or production systems. Operators evaluating NemoClaw are encouraged to review the Phase 4 findings and the recommendations therein.
+
+For coordinated reporting of the Medium/High findings, NVIDIA's vulnerability disclosure program is available at: https://www.nvidia.com/en-us/security/
+
+> **Maintainer note:** confirm the coordinated-disclosure status with NVIDIA PSIRT for the Medium/High findings and record it here before relying on this section.
 
 ## Legal
 

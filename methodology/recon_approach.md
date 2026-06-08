@@ -1,12 +1,14 @@
-# Black-Box Reconnaissance Methodology
+# Black-Box / Grey-Box Reconnaissance Methodology
 
 This document describes the approach used for Phase 1 of the NemoClaw security assessment. It is intended to be reproducible — anyone with the same setup should be able to follow these steps and verify the findings.
+
+> **Scope note on terminology.** NemoClaw's own distributed plugin code is open source (Apache 2.0) and was reviewed statically (see Phase 1 §4.4 / §6.4), so the assessment is **grey-box with respect to NemoClaw**. The OpenShell gateway runtime is assessed purely from observable behaviour inside the sandbox, so it is **black-box with respect to OpenShell**. "Black-box" in this repo refers specifically to the security-runtime layer, not to NemoClaw as a whole.
 
 ---
 
 ## Guiding Principles
 
-**No prior documentation assumed.** The assessment started with only what was publicly available at release: the GitHub repository and the install instructions. Internal architecture was inferred entirely from observable behavior.
+**No prior documentation assumed.** The assessment started with only what was publicly available at release: the GitHub repository and the install instructions. Internal architecture was inferred from observable behavior (and, for NemoClaw's own plugin code, from the open-source distribution).
 
 **Evidence before conclusions.** Every claim in the reports is backed by a command and its output. If there is no output, there is no finding.
 
@@ -69,7 +71,7 @@ touch /sandbox/test.txt
 ls -la /var/run/secrets/kubernetes.io/serviceaccount/
 wc -c /var/run/secrets/kubernetes.io/serviceaccount/token
 
-# Static analysis
+# Static analysis (NemoClaw open-source plugin code shipped in the image)
 find /opt -readable -type f 2>/dev/null | head -50
 grep -r 'api_key\|secret\|password' /opt/nemoclaw/dist/
 ```
@@ -97,7 +99,7 @@ python3 -c 'import socket, subprocess, os, ctypes; print("all available")'
 
 ## What This Methodology Does Not Cover
 
-- **Source code review** — the gateway source is not publicly available; this is purely behavioral analysis
+- **Source-level review of the OpenShell gateway runtime** — its internals are not exposed to the sandbox, so that layer is assessed purely behaviorally. (NemoClaw's own distributed plugin code *is* open source and *was* reviewed statically; see Phase 1 §4.4 / §6.4.)
 - **Fuzzing** — not performed in Phase 1
 - **Exploit development** — Phase 1 is reconnaissance only; no exploitation was attempted
 - **Network traffic capture** — would require host-level access not available in the sandbox
