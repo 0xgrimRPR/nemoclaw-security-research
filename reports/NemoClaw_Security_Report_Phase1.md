@@ -7,7 +7,7 @@
 | Date | March 17, 2026 |
 | Analyst | 0xgrimRPR |
 | Role | Junior Cybersecurity Engineer / Red Team Track |
-| Target | NVIDIA NemoClaw 0.0.x (Early Preview — Alpha) |
+| Target | NVIDIA NemoClaw v0.1.0 (Early Preview — Alpha) |
 | Environment | VMware VM / Ubuntu 22.04 LTS / No GPU |
 | Scope | Black-box reconnaissance & architecture mapping |
 | Classification | Research Use Only |
@@ -37,7 +37,7 @@ NemoClaw is a stack built on OpenClaw (the fastest-growing open-source AI agent 
 | Docker | Running, socket accessible to sandbox user group |
 | Node.js | v22.20.1 |
 | OpenShell | v0.0.7 (installed via PyPI / uv) |
-| NemoClaw | 0.0.x early preview (cloned from GitHub NVIDIA/NemoClaw) |
+| NemoClaw | v0.1.0 (cloned from GitHub NVIDIA/NemoClaw) |
 | Inference | NVIDIA Cloud API — Nemotron 3 Super 120B |
 | Sandbox name | cortana |
 
@@ -271,4 +271,4 @@ Early reconnaissance of emerging AI infrastructure is high-value work. Security 
 
 ---
 
-*Report generated: March 17, 2026 | NemoClaw 0.0.x (alpha) | For research purposes only*
+*Report generated: March 17, 2026 | NemoClaw v0.1.0 (alpha) | For research purposes only*

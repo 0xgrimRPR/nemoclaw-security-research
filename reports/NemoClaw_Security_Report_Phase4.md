@@ -4,7 +4,7 @@
 |-------|-------|
 | Date | May 22, 2026 |
 | Analyst | 0xgrimRPR |
-| Target | NemoClaw 0.0.x (early preview) + OpenClaw 2026.4.24 |
+| Target | NemoClaw v0.1.0 + OpenClaw 2026.4.24 |
 
 ## Summary
 
@@ -194,4 +194,4 @@ This is not NemoClaw-specific — it is a structural challenge for all AI agent 
 
 **Model:** Injection resistance is brittle — catches obvious patterns, fails when instructions are contextually natural. Model-level defenses should be a last resort, not primary control.
 
-*Report: May 22, 2026 | NemoClaw 0.0.x (early preview) + OpenClaw 2026.4.24 | For research purposes only*
+*Report: May 22, 2026 | NemoClaw v0.1.0 + OpenClaw 2026.4.24 | For research purposes only*

@@ -90,7 +90,7 @@ Six findings documented across prompt injection testing, memory poisoning, and e
 | F-25 | Device authentication disabled by default | MEDIUM |
 | F-26 | Agent detects injection but completes task first | LOW |
 | F-27 | Session-level memory poisoning → autonomous credential disclosure | HIGH |
-| F-28 | Agent prepares exfiltration payload for allowed egress endpoint | HIGH |
+| F-28 | Agent prepares exfiltration payload for allowed egress | HIGH |
 
 Full details in [`/reports/NemoClaw_Security_Report_Phase4.md`](/reports/NemoClaw_Security_Report_Phase4.md).
 
@@ -161,7 +161,7 @@ This is not NemoClaw-specific — it is a structural challenge for all AI agent 
 | Docker | Running, socket accessible to sandbox group |
 | Node.js | v22.20.1 |
 | OpenShell | v0.0.36 (PyPI via uv) |
-| NemoClaw | 0.0.x early preview (0.0.38 measured in Phase 3) |
+| NemoClaw | v0.1.0 |
 | OpenClaw | 2026.4.24 (cbcfdf6) |
 | Inference | NVIDIA Cloud API — Nemotron 3 Super 120B |
 | Sandbox name | cortana |
