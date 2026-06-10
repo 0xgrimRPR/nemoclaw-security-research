@@ -4,7 +4,7 @@
 |-------|-------|
 | Date | May 9, 2026 |
 | Analyst | 0xgrimRPR |
-| Target | NemoClaw v0.0.38 + OpenShell 0.0.36 |
+| Target | NemoClaw v0.1.0 + OpenShell 0.0.36 |
 
 ## Summary
 
@@ -76,4 +76,4 @@ Phase 3 confirmed Landlock LSM provides comprehensive filesystem boundary enforc
 | F-21 | Seccomp 3 Filters | INFORMATIONAL | 3 |
 | F-22 | NoNewPrivs Enforced | INFORMATIONAL | 3 |
 
-*Report: May 9, 2026 | For research purposes only*
+*Report: May 9, 2026 | NemoClaw v0.1.0 | For research purposes only*

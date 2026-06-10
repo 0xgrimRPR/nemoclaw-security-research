@@ -2,11 +2,11 @@
 
 ## Scope Statement
 
-This research was conducted against a **local, self-hosted installation** of NVIDIA NemoClaw (0.0.x early preview), running in a dedicated VMware virtual machine under the researcher's full control.
+This research was conducted against a **local, self-hosted installation** of NVIDIA NemoClaw v0.1.0, running in a dedicated VMware virtual machine under the researcher's full control.
 
 - No production systems were targeted
 - No NVIDIA infrastructure was accessed beyond the intended public NVIDIA Cloud API endpoint (used exactly as documented for model inference)
-- No credentials, tokens, or access belonging to third parties were accessed or retained. Credential values observed inside the local sandbox (the researcher's own throwaway instance) are redacted in published evidence.
+- No credentials, tokens, or access belonging to third parties were accessed or retained. Credential values observed inside the local sandbox (the researcher's own throwaway instance) are redacted/masked in published evidence.
 - All testing was performed in an isolated local environment
 
 ## Intent
@@ -30,11 +30,11 @@ The Medium and High findings concern a structural class of AI-agent risk — the
 
 ## Disclosure
 
-This research was performed against a local, self-hosted, open-source preview and targeted no third-party or production systems. Operators evaluating NemoClaw are encouraged to review the Phase 4 findings and the recommendations therein.
+This is independent, personal security research conducted against a local, self-hosted installation of a publicly released, open-source preview. No third-party, hosted, or production systems were involved, and no data belonging to others was accessed.
 
-For coordinated reporting of the Medium/High findings, NVIDIA's vulnerability disclosure program is available at: https://www.nvidia.com/en-us/security/
+No coordinated disclosure to NVIDIA was carried out prior to publication. The Medium and High findings do **not** describe a previously-undisclosed zero-day: they document a *structural* class of AI-agent risk — an autonomous agent's legitimate access to its own operating credentials — that has already been characterized publicly by independent researchers (e.g., Lasso Security, May 2026) against this same platform. They are published here as applied research and defensive analysis, not as an exploit release.
 
-> **Maintainer note:** confirm the coordinated-disclosure status with NVIDIA PSIRT for the Medium/High findings and record it here before relying on this section.
+NVIDIA's vulnerability disclosure program remains available at https://www.nvidia.com/en-us/security/ for anyone wishing to report related issues, and the maintainer welcomes coordination if NVIDIA requests it.
 
 ## Legal
 
