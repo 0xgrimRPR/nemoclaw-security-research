@@ -7,7 +7,7 @@
 | Date | April 16, 2026 |
 | Analyst | 0xgrimRPR |
 | Role | Junior Cybersecurity Engineer / Red Team Track |
-| Target | NVIDIA NemoClaw 0.0.x (early preview) + OpenShell 0.0.7 |
+| Target | NVIDIA NemoClaw v0.1.0 + OpenShell 0.0.7 |
 | Environment | VMware VM / Ubuntu 22.04 LTS / No GPU |
 | Scope | Gateway analysis & network policy bypass |
 | Classification | Research Use Only |
@@ -347,6 +347,6 @@ Overall, the network security controls continue to demonstrate maturity beyond w
 
 ---
 
-*Report generated: April 16, 2026 | NemoClaw 0.0.x (early preview) + OpenShell 0.0.7 | For research purposes only*
+*Report generated: April 16, 2026 | NemoClaw v0.1.0 + OpenShell 0.0.7 | For research purposes only*
 
 *Nota: Este reporte es continuación de NemoClaw_Security_Report_Phase1.md. Las fases 3 y 4 se documentarán en reportes subsecuentes.*
