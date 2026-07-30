@@ -196,7 +196,7 @@ nemoclaw-security-research/
 
 This project is part of a personal portfolio focused on AI security and Red Team research. The assessment was conducted in a self-hosted environment using publicly available software. No production systems were targeted. All testing was performed against a local installation under controlled conditions.
 
-**Researcher:** Mike  
+**Researcher:** 0xgrimRPR  
 **Handle:** 0xgrimRPR  
 **Role:** Junior Cybersecurity Engineer | Red Team Track  
 **Active certifications in progress:** CEH Master, OSCP path  
