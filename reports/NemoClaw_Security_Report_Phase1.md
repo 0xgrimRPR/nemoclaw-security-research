@@ -20,7 +20,7 @@ This report documents a black-box security reconnaissance session conducted agai
 
 NemoClaw is a stack built on OpenClaw (the fastest-growing open-source AI agent project in GitHub history) that adds privacy and security guardrails via NVIDIA OpenShell. The platform runs AI agents inside sandboxed environments using multiple defense-in-depth mechanisms.
 
-**Overall assessment:** The security posture is well-designed for alpha-stage software. No critical vulnerabilities or credential leaks were identified. All five defense layers functioned as intended. One notable observation involves a Kubernetes service account token that is currently mitigated by Landlock but warrants ongoing monitoring.
+**Overall assessment:** The security posture is well-designed for alpha-stage software. No critical vulnerabilities or credential leaks were identified. All seven defense layers functioned as intended. One notable observation involves a Kubernetes service account token that is currently mitigated by Landlock but warrants ongoing monitoring.
 
 ---
 

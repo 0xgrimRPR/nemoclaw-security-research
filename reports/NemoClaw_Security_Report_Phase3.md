@@ -4,7 +4,7 @@
 |-------|-------|
 | Date | May 9, 2026 |
 | Analyst | 0xgrimRPR |
-| Target | NemoClaw v0.0.38 + OpenShell 0.0.36 |
+| Target | NemoClaw v0.1.0 + OpenShell 0.0.36 |
 
 ## Summary
 
@@ -38,42 +38,42 @@ Phase 3 confirmed Landlock LSM provides comprehensive filesystem boundary enforc
 
 | ID | Finding | Severity |
 |----|---------|----------|
-| F-13 | Root dir not listable | INFO |
-| F-14 | Environ no secrets | INFO |
-| F-15 | Symlink blocked | INFO |
-| F-16 | Hardlink blocked | INFO |
+| F-13 | Root dir not listable | INFORMATIONAL |
+| F-14 | Environ no secrets | INFORMATIONAL |
+| F-15 | Symlink blocked | INFORMATIONAL |
+| F-16 | Hardlink blocked | INFORMATIONAL |
 | F-17 | PID 1 info leak | LOW |
-| F-18 | Safety scripts read-only | INFO |
-| F-19 | DNS proxy change | INFO |
+| F-18 | Safety scripts read-only | INFORMATIONAL |
+| F-19 | DNS proxy change | INFORMATIONAL |
 | F-20 | Agent state writable | LOW |
-| F-21 | Seccomp 3 filters | INFO |
-| F-22 | NoNewPrivs enforced | INFO |
+| F-21 | Seccomp 3 filters | INFORMATIONAL |
+| F-22 | NoNewPrivs enforced | INFORMATIONAL |
 
 ## Cumulative Findings (F-01 to F-22)
 
 | ID | Finding | Severity | Phase |
 |----|---------|----------|-------|
 | F-01 | K8s Token Mounted but Inaccessible | LOW | 1 |
-| F-02 | K3s Network Unreachable | INFO | 1 |
-| F-03 | PID 1 Root with Capabilities | INFO | 1 |
-| F-04 | No Hardcoded Credentials | INFO | 1 |
-| F-05 | Minimal Toolset | INFO | 1 |
+| F-02 | K3s Network Unreachable | INFORMATIONAL | 1 |
+| F-03 | PID 1 Root with Capabilities | INFORMATIONAL | 1 |
+| F-04 | No Hardcoded Credentials | INFORMATIONAL | 1 |
+| F-05 | Minimal Toolset | INFORMATIONAL | 1 |
 | F-06 | Missing K8s Secret | BUG | 2 |
-| F-07 | Gateway Proxy on 3128 | INFO | 2 |
-| F-08 | Proxy Bypass Resistant | INFO | 2 |
+| F-07 | Gateway Proxy on 3128 | INFORMATIONAL | 2 |
+| F-08 | Proxy Bypass Resistant | INFORMATIONAL | 2 |
 | F-09 | Data Channel via githubusercontent | LOW | 2 |
 | F-10 | TLS MITM via OpenShell CA | MEDIUM | 2 |
-| F-11 | mTLS Key Protected | INFO | 2 |
-| F-12 | Non-CONNECT Blocked | INFO | 2 |
-| F-13 | Root Dir Not Listable | INFO | 3 |
-| F-14 | Environ No Secrets | INFO | 3 |
-| F-15 | Symlink Blocked | INFO | 3 |
-| F-16 | Hardlink Blocked | INFO | 3 |
+| F-11 | mTLS Key Protected | INFORMATIONAL | 2 |
+| F-12 | Non-CONNECT Blocked | INFORMATIONAL | 2 |
+| F-13 | Root Dir Not Listable | INFORMATIONAL | 3 |
+| F-14 | Environ No Secrets | INFORMATIONAL | 3 |
+| F-15 | Symlink Blocked | INFORMATIONAL | 3 |
+| F-16 | Hardlink Blocked | INFORMATIONAL | 3 |
 | F-17 | PID 1 Info Leak | LOW | 3 |
-| F-18 | Safety Scripts Read-Only | INFO | 3 |
-| F-19 | DNS Proxy Change | INFO | 3 |
+| F-18 | Safety Scripts Read-Only | INFORMATIONAL | 3 |
+| F-19 | DNS Proxy Change | INFORMATIONAL | 3 |
 | F-20 | Agent State Writable | LOW | 3 |
-| F-21 | Seccomp 3 Filters | INFO | 3 |
-| F-22 | NoNewPrivs Enforced | INFO | 3 |
+| F-21 | Seccomp 3 Filters | INFORMATIONAL | 3 |
+| F-22 | NoNewPrivs Enforced | INFORMATIONAL | 3 |
 
-*Report: May 9, 2026 | For research purposes only*
+*Report: May 9, 2026 | NemoClaw v0.1.0 | For research purposes only*

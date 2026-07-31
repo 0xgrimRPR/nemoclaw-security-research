@@ -17,7 +17,7 @@
 
 ## 1. Executive Summary
 
-This report documents Phase 1 (Gateway Analysis) and Phase 2 (Network Policy Bypass) testing of NVIDIA NemoClaw, continuing the black-box security reconnaissance initiated in Report #1 (March 17, 2026). Testing was conducted on April 16, 2026, approximately one month after the initial assessment.
+This report documents two parts of the overall Phase 2 assessment — Part A (Gateway Analysis) and Part B (Network Policy Bypass) — continuing the security reconnaissance initiated in Report #1 (March 17, 2026). Testing was conducted on April 16, 2026, approximately one month after the initial assessment.
 
 During environment setup, a reproducible bug was discovered in OpenShell 0.0.7: the onboarding and gateway provisioning processes fail to create a required Kubernetes secret (`openshell-ssh-handshake`), preventing sandbox initialization. This bug was manually remediated to proceed with testing.
 
@@ -41,7 +41,7 @@ Network policy bypass testing confirmed that the proxy is resistant to common ev
 
 ---
 
-## 3. Gateway Analysis (Phase 1 Testing)
+## 3. Gateway Analysis (Part A)
 
 ### 3.1 Gateway Architecture Discovery
 
@@ -137,9 +137,9 @@ The TLS MITM architecture means the gateway has full visibility into all HTTPS r
 
 ---
 
-## 5. Network Policy Bypass Testing (Phase 2)
+## 5. Network Policy Bypass Testing (Part B)
 
-Twelve bypass techniques were tested against the proxy policy engine. All bypass attempts were unsuccessful, confirming robust policy enforcement.
+Twelve bypass techniques were tested against the proxy policy engine. Ten were blocked or mitigated; two endpoints (the objects.githubusercontent.com data channel and the GitHub API) were permitted by policy and are tracked separately (F-09). No policy-restricted destination was reached.
 
 | # | Technique | Result | Details |
 |---|-----------|--------|---------|
@@ -208,7 +208,7 @@ https_proxy=http://10.200.0.1:3128
 
 ### F-08 — Proxy Resistant to Common Bypass Techniques [INFORMATIONAL]
 
-**Description:** The proxy policy engine was tested against 10 bypass techniques: Host header spoofing, IP-based CONNECT, non-standard ports, subdomain wildcarding, SNI mismatch, post-CONNECT internal reach, nested CONNECT, non-CONNECT methods, and more. All techniques were blocked or mitigated.
+**Description:** The proxy policy engine was tested against twelve bypass techniques (Host header spoofing, IP-based CONNECT, non-standard ports, subdomain wildcarding, SNI mismatch, post-CONNECT internal reach, nested CONNECT, non-CONNECT methods, and more). Ten were blocked or mitigated; two endpoints were permitted by policy and are tracked separately (F-09).
 
 **Evidence:**
 
@@ -298,17 +298,17 @@ DELETE http://github.com/ HTTP/1.1 → 403 Forbidden
 | ID | Finding | Severity | Report |
 |----|---------|----------|--------|
 | F-01 | K8s Service Account Token Mounted but Inaccessible | LOW | #1 (March) |
-| F-02 | K3s Internal Network Unreachable from Sandbox | INFO | #1 (March) |
-| F-03 | PID 1 Runs as Root with Non-Zero Capabilities | INFO | #1 (March) |
-| F-04 | No Hardcoded Credentials in Distributed Code | INFO | #1 (March) |
-| F-05 | Minimal Toolset Limits Post-Exploitation | INFO | #1 (March) |
+| F-02 | K3s Internal Network Unreachable from Sandbox | INFORMATIONAL | #1 (March) |
+| F-03 | PID 1 Runs as Root with Non-Zero Capabilities | INFORMATIONAL | #1 (March) |
+| F-04 | No Hardcoded Credentials in Distributed Code | INFORMATIONAL | #1 (March) |
+| F-05 | Minimal Toolset Limits Post-Exploitation | INFORMATIONAL | #1 (March) |
 | F-06 | OpenShell 0.0.7 Missing K8s Secret During Onboard | BUG | #2 (April) |
-| F-07 | Gateway Proxy Architecture on Port 3128 | INFO | #2 (April) |
-| F-08 | Proxy Resistant to Common Bypass Techniques | INFO | #2 (April) |
+| F-07 | Gateway Proxy Architecture on Port 3128 | INFORMATIONAL | #2 (April) |
+| F-08 | Proxy Resistant to Common Bypass Techniques | INFORMATIONAL | #2 (April) |
 | F-09 | Data Channel via objects.githubusercontent.com | LOW | #2 (April) |
 | F-10 | TLS MITM via OpenShell Sandbox CA | MEDIUM | #2 (April) |
-| F-11 | mTLS Client Key Protected by Landlock | INFO | #2 (April) |
-| F-12 | Non-CONNECT HTTP Methods Blocked at Proxy | INFO | #2 (April) |
+| F-11 | mTLS Client Key Protected by Landlock | INFORMATIONAL | #2 (April) |
+| F-12 | Non-CONNECT HTTP Methods Blocked at Proxy | INFORMATIONAL | #2 (April) |
 
 ---
 
@@ -337,7 +337,7 @@ DELETE http://github.com/ HTTP/1.1 → 403 Forbidden
 
 ## 9. Conclusions
 
-Phase 1 and Phase 2 testing confirms that the OpenShell gateway implements a well-designed network security boundary. The CONNECT-only proxy with hostname:port exact matching, combined with TLS MITM inspection, creates a comprehensive traffic control layer that resisted all tested bypass techniques.
+Part A and Part B testing confirms that the OpenShell gateway implements a well-designed network security boundary. The CONNECT-only proxy with hostname:port exact matching, combined with TLS MITM inspection, creates a comprehensive traffic control layer that resisted all tested bypass techniques.
 
 The most significant finding is the TLS MITM architecture (F-10), which is a deliberate design choice rather than a vulnerability. It provides the gateway with full traffic visibility, enabling future fine-grained controls (e.g., HTTP method restrictions per endpoint, request body inspection). However, it also means the gateway is a high-value target — its compromise would expose all sandbox HTTPS traffic.
 

@@ -6,7 +6,7 @@ This research was conducted against a **local, self-hosted installation** of NVI
 
 - No production systems were targeted
 - No NVIDIA infrastructure was accessed beyond the intended public NVIDIA Cloud API endpoint (used exactly as documented for model inference)
-- No credentials, tokens, or access belonging to third parties were accessed or retained
+- No credentials, tokens, or access belonging to third parties were accessed or retained. Credential values observed inside the local sandbox (the researcher's own throwaway instance) are redacted/masked in published evidence.
 - All testing was performed in an isolated local environment
 
 ## Intent
@@ -19,16 +19,22 @@ The goal of this research is to understand the security architecture of an emerg
 
 ## Findings Disposition
 
-All findings in this repository are either:
+Findings in this repository span the full severity range:
 
-- **Informational / positive findings** — documenting controls that work as intended
-- **Low severity** — mitigated by existing controls, with a recommendation to monitor
+- **Informational / positive** — controls working as intended (the majority of Phases 1–3)
+- **Low** — mitigated by existing controls, with a recommendation to monitor (e.g., F-01, F-09, F-17, F-20, F-26)
+- **Medium** — F-10 (TLS MITM design trade-off), F-24, F-25
+- **High** — F-23, F-27, F-28 (Phase 4: prompt-injection-driven credential disclosure and preparation of an exfiltration payload)
 
-No critical or high-severity vulnerabilities were identified in Phase 1. If critical findings are discovered in future phases, they will be reported to NVIDIA's security team via their responsible disclosure process before public disclosure.
+The Medium and High findings concern a structural class of AI-agent risk — the agent's own legitimate access to the credentials it needs to operate — that is **not unique to NemoClaw** and has been documented publicly by independent researchers (e.g., Lasso Security, May 2026).
 
-## NVIDIA Security Contact
+## Disclosure
 
-NVIDIA's vulnerability disclosure program: https://www.nvidia.com/en-us/security/
+This is independent, personal security research conducted against a local, self-hosted installation of a publicly released, open-source preview. No third-party, hosted, or production systems were involved, and no data belonging to others was accessed.
+
+No coordinated disclosure to NVIDIA was carried out prior to publication. The Medium and High findings do **not** describe a previously-undisclosed zero-day: they document a *structural* class of AI-agent risk — an autonomous agent's legitimate access to its own operating credentials — that has already been characterized publicly by independent researchers (e.g., Lasso Security, May 2026) against this same platform. They are published here as applied research and defensive analysis, not as an exploit release.
+
+NVIDIA's vulnerability disclosure program remains available at https://www.nvidia.com/en-us/security/ for anyone wishing to report related issues, and the maintainer welcomes coordination if NVIDIA requests it.
 
 ## Legal
 

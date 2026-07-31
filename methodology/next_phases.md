@@ -11,13 +11,13 @@
 
 Completed March 17, 2026. See `reports/NemoClaw_Security_Report_Phase1.md`.
 
-Five findings (F-01 through F-05) documented. Kubernetes-in-Docker architecture mapped. All five defense layers verified as active.
+Five findings (F-01 through F-05) documented. Kubernetes-in-Docker architecture mapped. All seven defense layers enumerated in Phase 1 verified as active.
 
 ### Phase 2 — Gateway Analysis & Network Policy Bypass ✅
 
 Completed April 16, 2026. See `reports/NemoClaw_Security_Report_Phase2.md`.
 
-Seven findings (F-06 through F-12) documented. Gateway proxy architecture on port 3128 discovered. TLS MITM via OpenShell Sandbox CA confirmed. All bypass techniques blocked or mitigated. One blocking onboarding bug (F-06) identified.
+Seven findings (F-06 through F-12) documented. Gateway proxy architecture on port 3128 discovered. TLS MITM via OpenShell Sandbox CA confirmed. Of twelve bypass techniques tested, ten were blocked or mitigated. One blocking onboarding bug (F-06) identified.
 
 ### Phase 3 — Filesystem / Landlock Boundary Testing ✅
 

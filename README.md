@@ -2,7 +2,7 @@
 
 **Black-box security assessment of NVIDIA NemoClaw — AI agent sandbox architecture analysis**
 
-> Conducted within 24 hours of the platform's public release at GTC 2026 (March 16, 2026).  
+> Phase 1 was conducted within 24 hours of the platform's public release at GTC 2026 (March 16, 2026); Phases 2–4 followed across April–May 2026.  
 > This research is complete. All four phases (reconnaissance → prompt injection) have been executed.
 
 ---
@@ -11,9 +11,9 @@
 
 NemoClaw is NVIDIA's answer to the emerging challenge of running autonomous AI agents safely. Built on OpenClaw — one of the fastest-growing open-source AI agent projects in GitHub history — it layers privacy and security controls via NVIDIA OpenShell.
 
-As AI agent platforms become critical infrastructure, understanding their security architecture from the outside is increasingly valuable. This research documents what a black-box assessor can discover, infer, and test against a freshly released AI sandbox — without documentation, without source-level access to the security layer, and without vendor guidance.
+As AI agent platforms become critical infrastructure, understanding their security architecture from the outside is increasingly valuable. This research documents what a black-box assessor can discover, infer, and test against a freshly released AI sandbox — without documentation, without source-level access to the OpenShell security runtime (NemoClaw's own plugin code is open source and was reviewed statically), and without vendor guidance.
 
-This type of work aligns directly with what industry initiatives like [Anthropic's Project Glasswing](https://www.anthropic.com) are validating: that hands-on AI infrastructure security research, not just theory, is what moves the needle on AI safety.
+This kind of applied, hands-on work reflects a broader 2026 shift toward defensive AI security research — the same concern motivating initiatives like [Anthropic's Project Glasswing](https://www.anthropic.com/glasswing), a partner program that gives critical-infrastructure organizations (NVIDIA among them) early access to frontier models for defensive vulnerability discovery.
 
 ---
 
@@ -90,7 +90,7 @@ Six findings documented across prompt injection testing, memory poisoning, and e
 | F-25 | Device authentication disabled by default | MEDIUM |
 | F-26 | Agent detects injection but completes task first | LOW |
 | F-27 | Session-level memory poisoning → autonomous credential disclosure | HIGH |
-| F-28 | Agent prepares exfiltration payload for allowed egress endpoint | HIGH |
+| F-28 | Agent prepares exfiltration payload for allowed egress | HIGH |
 
 Full details in [`/reports/NemoClaw_Security_Report_Phase4.md`](/reports/NemoClaw_Security_Report_Phase4.md).
 
@@ -129,7 +129,9 @@ Reconnaissance revealed a **Kubernetes-in-Docker** pattern not fully documented 
 
 ### Key Assessment Results by Phase
 
-**Phase 2 — Network Policy Bypass:** 12 bypass techniques tested, all blocked or mitigated. One data channel identified via GitHub CDN (F-09).
+**Phase 1 — Reconnaissance:** Kubernetes-in-Docker architecture mapped. Seven defense layers identified and verified as active. K8s service account token mounted but protected by Landlock (F-01). No hardcoded credentials found (F-04). Minimal toolset confirmed (F-05).
+
+**Phase 2 — Network Policy Bypass:** 12 bypass techniques tested; 10 blocked or mitigated and two endpoints permitted by policy, including one data channel via GitHub CDN (F-09).
 
 **Phase 3 — Filesystem Boundary:** Symlink traversal, hardlink attacks, and procfs enumeration all blocked by Landlock. Agent state files writable (F-20) — confirmed exploitable in Phase 4.
 
@@ -141,7 +143,7 @@ Reconnaissance revealed a **Kubernetes-in-Docker** pattern not fully documented 
 
 ### What NemoClaw Gets Right
 
-NemoClaw demonstrates one of the most thoughtful approaches to AI agent sandboxing in 2026. Six independent infrastructure layers create meaningful barriers to sandbox escape. Phases 1–3 confirmed all infrastructure controls function as intended.
+NemoClaw demonstrates one of the most thoughtful approaches to AI agent sandboxing in 2026. Multiple independent infrastructure layers create meaningful barriers to sandbox escape. Phases 1–3 confirmed all infrastructure controls function as intended.
 
 ### The Fundamental Gap
 
@@ -159,7 +161,7 @@ This is not NemoClaw-specific — it is a structural challenge for all AI agent 
 | Docker | Running, socket accessible to sandbox group |
 | Node.js | v22.20.1 |
 | OpenShell | v0.0.36 (PyPI via uv) |
-| NemoClaw | v0.0.38 / v0.1.0 |
+| NemoClaw | v0.1.0 |
 | OpenClaw | 2026.4.24 (cbcfdf6) |
 | Inference | NVIDIA Cloud API — Nemotron 3 Super 120B |
 | Sandbox name | cortana |
@@ -175,15 +177,15 @@ nemoclaw-security-research/
 │   ├── NemoClaw_Security_Report_Phase1.md
 │   ├── NemoClaw_Security_Report_Phase2.md
 │   ├── NemoClaw_Security_Report_Phase3.md
-│   ├── NemoClaw_Security_Report_Phase4.md           (NEW)
+│   ├── NemoClaw_Security_Report_Phase4.md
 │   └── findings/
 │       ├── F-01 through F-22                        (Phases 1–3)
-│       ├── F-23_prompt_injection_credential_disclosure.md    (NEW)
-│       ├── F-24_operator_token_accessible.md                 (NEW)
-│       ├── F-25_device_auth_disabled.md                      (NEW)
-│       ├── F-26_injection_detected_task_completed.md         (NEW)
-│       ├── F-27_session_memory_poisoning.md                  (NEW)
-│       └── F-28_exfiltration_payload_prepared.md             (NEW)
+│       ├── F-23_prompt_injection_credential_disclosure.md
+│       ├── F-24_operator_token_accessible.md
+│       ├── F-25_device_auth_disabled.md
+│       ├── F-26_injection_detected_task_completed.md
+│       ├── F-27_session_memory_poisoning.md
+│       └── F-28_exfiltration_payload_prepared.md
 ├── methodology/
 │   ├── recon_approach.md
 │   └── next_phases.md
